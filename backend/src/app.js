@@ -4,12 +4,17 @@ dotenv.config()
 import { connectDB } from './libs/db.js'
 import authRouter from "./routes/authRoute.js"
 import cookieParser from "cookie-parser"
+import cors from "cors"
 
 const app = express()
 const PORT = process.env.PORT || 8000   
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors({
+    baseUrl: process.env.CLIENR_URL,
+    
+}))
 
 app.use('/api/auth', authRouter)
 
