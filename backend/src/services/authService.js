@@ -8,8 +8,8 @@ const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000
 
 export const signUpService = async (dataInput) => {
     try {
-        const { username, email, password, firstName, lastName } = dataInput
-        if ( !username || !email || !password || !firstName || !lastName ) 
+        const { username, email, password, firstname, lastname } = dataInput
+        if ( !username || !email || !password || !firstname || !lastname ) 
             return {
                 Ec: -1,
                 Mes: "The registration information is incomplete."
@@ -33,7 +33,7 @@ export const signUpService = async (dataInput) => {
             username, 
             email, 
             hashedPassword,
-            displayName: `${firstName} ${lastName}`
+            displayName: `${firstname} ${lastname}`
         })
             
         return {

@@ -1,11 +1,18 @@
 import type { User } from "./user"
 
+export interface ResponseServer {
+    Ec: number,
+    Mes: string
+}
 export interface AuthState {
     accessToken: string | null,
     user: User | null,
     loading: boolean
+    clearState: () => void
 
-    register: (username: string, password: string, email: string, firstname: string, lastname: string) => Promise<void>
+    signup: (username: string, password: string, email: string, firstname: string, lastname: string) => Promise<ResponseServer>
     
-    login: (username: string, password: string) => Promise<void>
+    signin: (username: string, password: string) => Promise<ResponseServer>
+    
+    logout: () => Promise<void>
 }

@@ -9,11 +9,12 @@ import cors from "cors"
 const app = express()
 const PORT = process.env.PORT || 8000   
 
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    baseUrl: process.env.CLIENR_URL,
-    
+    origin: process.env.CLIENT_URL,
+    credentials: true, 
 }))
 
 app.use('/api/auth', authRouter)

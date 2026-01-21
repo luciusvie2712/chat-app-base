@@ -12,6 +12,9 @@ import { Label } from "@radix-ui/react-label"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useAuthStore } from "@/stores/useAuthStore"
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
 
 const registerSchema = z.object({
   firstname: z.string().min(1, "Required information"),
@@ -27,13 +30,25 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
+  const { signup } = useAuthStore()
+  const navigate = useNavigate()
   const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<RegisterFormValue>({
     resolver: zodResolver(registerSchema)
   })
 
-  const onSubmit = (data: RegisterFormValue) => {
-    /// api
+  const onSubmit = async (data: RegisterFormValue) => {
+    try {
+      const { firstname, lastname, username, email, password } = data
+      const resData = await signup(username, password, email, firstname, lastname)
+      if (resData?.Ec === 0) {
+        navigate("/login")
+        toast.success(resData?.Mes)
+      } else {
+        toast.warning(resData?.Mes)
+      }
+    } catch (error) {
+      console.error("!!! Error Sign Up: ", error)
+    }
   }
 
   return (

@@ -7,29 +7,46 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     accessToken: null,
     user: null,
     loading: false,
+    clearState: () => {
+        set({accessToken: null, user: null, loading: false})
+    },
 
-    register: async (username, password, email, firstname, lastname) => {
+    signup: async (username, password, email, firstname, lastname) => {
         try {
             set({loading: true})
-            await authService.register(username, password, email, firstname, lastname)
-
-            toast.success("Register success, please login account.")
+            const res = await authService.signup(username, password, email, firstname, lastname)
+            return res
         } catch (error) {
             console.error(error)
-            toast.error("Register failed.")
+        } finally {
+            set({loading: false})
         }
     },
 
-    login: async (username, password) => {
+    signin: async (username, password) => {
         try {
             set({loading: true})
-            const accessToken = await authService.login(username, password)
+            const res = await authService.signin(username, password)
+            const accessToken = res.accessToken
             set({accessToken})
-
-            toast.success("Login success, wellcome back")
+            return res
+            // toast.success("Login success, wellcome back")
         } catch (error) {
             console.error(error)
             toast.error("Login failed.")
+        } finally {
+            set({loading: false})
+        }
+    },
+
+    logout: async () => {
+        try {
+            get().clearState()
+            await authService.logout()
+            toast.success("Account logged out successfully.")
+        } catch (error) {
+            console.error(error)
+            toast.error("LogOut failed.")
         }
     }
 }))

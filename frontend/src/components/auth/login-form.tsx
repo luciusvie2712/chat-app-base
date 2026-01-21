@@ -8,10 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useAuthStore } from "@/stores/useAuthStore"
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
 
 const loginSchema = z.object({
   username: z.string().min(5, "Usernames must have at least 5 characters."),
@@ -24,13 +27,25 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
+  const { signin } = useAuthStore()
+  const navigate = useNavigate()
   const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<LoginFormValue>({
     resolver: zodResolver(loginSchema)
   })
 
-  const onSubmit = ( data: LoginFormValue ) => {
-    // api
+  const onSubmit = async ( data: LoginFormValue ) => {
+    try {
+      const { username, password } = data
+      const resData = await signin(username, password)
+      if (resData?.Ec === 0) {
+        navigate("/")
+        toast.success(resData?.Mes)
+      } else {
+        toast.warning(resData?.Mes)
+      }
+    } catch (error) {
+      console.error("!!! Error Sign Up: ", error)
+    }
   }
 
   return (
@@ -54,7 +69,7 @@ export function LoginForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="password" className="block text-sm">Password</Label>
-              <Input id="password" type="text" placeholder="Enter your password" {...register("password")}></Input>
+              <Input id="password" type="password" placeholder="Enter your password" {...register("password")}></Input>
               {errors.password && (
                 <p className="text-destructive text-sm">{errors.password.message}</p>
               )}
