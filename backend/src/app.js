@@ -4,6 +4,7 @@ dotenv.config()
 import { connectDB } from './libs/db.js'
 import authRouter from "./routes/authRoute.js"
 import userRouter from "./routes/userRoute.js"
+import friendRouter from "./routes/friendRoute.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import { protectedMiddleware } from './middlewares/authMiddleware.js'
@@ -22,7 +23,8 @@ app.use(cors({
 app.use('/api/auth', authRouter)
 
 app.use(protectedMiddleware)
-app.use('/api/user', userRouter)
+app.use('/api/users', userRouter)
+app.use('/api/friends', friendRouter)
 
 connectDB().then(() => {
     app.listen(PORT, () => {
