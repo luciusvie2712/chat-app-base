@@ -29,11 +29,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const res = await authService.signin(username, password)
             const accessToken = res.accessToken
             set({accessToken})
+            await get().fetchMe()
             return res
-            // toast.success("Login success, wellcome back")
         } catch (error) {
             console.error(error)
-            toast.error("Login failed.")
         } finally {
             set({loading: false})
         }
@@ -47,6 +46,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
             console.error(error)
             toast.error("LogOut failed.")
+        }
+    },
+
+    fetchMe: async () => {
+        try {
+            set({loading: true})
+            const user = await authService.fetchMe()
+            if (user.Ec === 0) {
+                set({user: user.data})
+            } else {
+                set({ user: null, accessToken: null})
+                toast.error("An error occurred while retrieving user data. Please try again.")
+            }
+        } catch (error) {
+            console.error(error)
+            set({ user: null, accessToken: null})
+            toast.error("An error occurred while retrieving user data. Please try again.")
+        } finally {
+            set({loading: false})
         }
     }
 }))

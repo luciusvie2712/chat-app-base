@@ -21,7 +21,7 @@ export const protectedMiddleware = async (req, res, next) => {
             })
 
         // tim thong tin user
-        const user = await User.findById(decodedUser.userId).select("-hashpassword")
+        const user = await User.findById(decodedUser.userId).select("-hashedPassword")
         if (!user) return res.status(404).json({
             Ec: -1,
             Mes: "User information not found."

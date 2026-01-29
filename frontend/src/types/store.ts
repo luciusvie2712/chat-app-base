@@ -1,8 +1,8 @@
-import type { User } from "./user"
+import type { User } from "./user.ts"
 
 export interface ResponseServer {
     Ec: number,
-    Mes: string
+    Mes: string,
 }
 export interface AuthState {
     accessToken: string | null,
@@ -15,4 +15,6 @@ export interface AuthState {
     signin: (username: string, password: string) => Promise<ResponseServer>
     
     logout: () => Promise<void>
+    
+    fetchMe: () => Promise<void>
 }

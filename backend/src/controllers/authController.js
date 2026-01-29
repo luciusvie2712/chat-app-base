@@ -20,7 +20,7 @@ export const signIn = async (req, res) => {
     try {
         const resData = await signInService(req.body)
         if (resData.Ec !== 0) 
-            return res.status(400).json(resData)
+            return res.status(200).json(resData)
 
         res.cookie('refreshToken', resData.refreshToken, {
             httpOnly: true,
@@ -60,3 +60,4 @@ export const signOut = async (req, res) => {
         })
     }
 }
+
