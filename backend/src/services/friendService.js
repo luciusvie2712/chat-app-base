@@ -104,8 +104,80 @@ export const acceptFriendRequestService = async (requestId, userId) => {
 
 export const declineFriendRequestService = async (requestId, userId) => {
     try {
+        const request = await FriendRequest.findById(requestId)
+        if (!request) {
+            return {
+                Ec: -1,
+                Mes: "The friend request does not exist."
+            }
+        }
+        if (request.to.toString() !== userId.toString()) {
+            return {
+                Ec: -2,
+                Mes: "You don't have the right to refuse a friend request."
+            }
+        }
         
+        await FriendRequest.findByIdAndDelete(requestId)
+        return {
+            Ec: 0,
+            Mes: "Successfully declined the friend request."
+        }
     } catch (error) {
-        
+        console.error("An error occurred in declineFriendRequestService.", error)
+        return {
+            Ec: -1,
+            Mes: "An error occurred during the service processing."
+        }
+    }
+}
+
+export const getAllFriendService = async (userId) => {
+    try {
+        const friendShip = await Friend.find({
+            $or: [
+                { userA: userId },
+                { userB: userId }
+            ]
+        }).populate("userA", "_id displayName avatarUrl").populate("userB", "_id displayName avatarUrl")
+
+        if (!friendShip.length) {
+            return {
+                Ec: 0,
+                friends: []
+            }
+        }
+        const friends = friendShip.map((f) => f.userA._id.toString() === userId.toString() ? f.userB : f.userA)
+        return {
+            Ec: 0,
+            friends
+        }
+    } catch (error) {
+        console.error("An error occurred in getAllFriendService.", error)
+        return {
+            Ec: -1,
+            Mes: "An error occurred during the service processing."
+        }
+    }
+}
+
+export const getFriendRequestService = async (userId) => {
+    try {
+        const populateFields = "_id username displayName avatarUrl"
+        const [sent, received] = await Promise.all([
+            FriendRequest.find({ from: userId }).populate("to", populateFields),
+            FriendRequest.find({ to: userId }).populate("from", populateFields)
+        ])
+        return {
+            Ec: 0,
+            sent,
+            received
+        }
+    } catch (error) {
+        console.error("An error occurred in getFriendRequestService.", error)
+        return {
+            Ec: -1,
+            Mes: "An error occurred during the service processing."
+        }
     }
 }
